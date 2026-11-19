@@ -1127,6 +1127,23 @@ export default function AdminPage() {
 
         {/* Content Area */}
         <main className="flex-1 p-6 max-h-[calc(100vh-56px)] overflow-y-auto">
+          {dbStatus && !dbStatus.connected && (
+            <div className="mb-5 bg-red-50 border border-red-300 text-red-900 rounded-xl p-4 flex items-start gap-3 shadow-xs">
+              <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+              <div className="text-xs space-y-1">
+                <p className="font-bold text-sm text-red-950">
+                  PostgreSQL Database Not Connected
+                </p>
+                <p>
+                  {dbStatus.error || 'Unable to connect to PostgreSQL.'}
+                </p>
+                <p className="text-red-800">
+                  If running on Vercel, add <code className="bg-red-100 px-1 py-0.5 rounded font-mono font-bold">DB_HOST</code>, <code className="bg-red-100 px-1 py-0.5 rounded font-mono font-bold">DB_PORT</code>, <code className="bg-red-100 px-1 py-0.5 rounded font-mono font-bold">DB_NAME</code>, <code className="bg-red-100 px-1 py-0.5 rounded font-mono font-bold">DB_USER</code>, <code className="bg-red-100 px-1 py-0.5 rounded font-mono font-bold">DB_PASSWORD</code>, and <code className="bg-red-100 px-1 py-0.5 rounded font-mono font-bold">DB_SSL</code> in <strong>Vercel Dashboard → Settings → Environment Variables</strong> and click <strong>Redeploy</strong>.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* TAB: DASHBOARD */}
           {activeTab === 'dashboard' && (
             <div className="space-y-6">

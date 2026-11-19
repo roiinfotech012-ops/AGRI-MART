@@ -86,6 +86,11 @@ export function getPool(): Pool {
   }
 
   const sslEnabled = process.env.DB_SSL === 'true';
+  if (process.env.VERCEL && !process.env.DATABASE_URL && !process.env.DB_HOST) {
+    throw new Error(
+      'PostgreSQL is not configured on Vercel. Please add DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD, and DB_SSL in Vercel Dashboard -> Settings -> Environment Variables and Redeploy.'
+    );
+  }
   const poolConfig = process.env.DATABASE_URL
     ? {
         connectionString: process.env.DATABASE_URL,
