@@ -436,7 +436,7 @@ export function AdminImageUploader({
         }}
         onDragLeave={() => setIsDragOver(false)}
         onDrop={handleDrop}
-        className={`flex items-center gap-3 bg-gray-50 border rounded-lg transition-colors ${
+        className={`flex items-center gap-3 bg-gray-50 border rounded-lg transition-colors overflow-hidden ${
           isDragOver ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-200'
         } ${compact ? 'p-2' : 'p-2.5'}`}
       >
@@ -486,19 +486,19 @@ export function AdminImageUploader({
         <div className="flex-1 min-w-0 space-y-1.5">
           {/* Quality Mode Selector for Image Uploads */}
           {!isPdf && (
-            <div className="flex items-center gap-1.5 flex-wrap">
+            <div className="space-y-1 min-w-0 w-full">
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-emerald-600" />
+                <Sparkles className="w-3 h-3 text-emerald-600 shrink-0" />
                 <span>Quality:</span>
               </span>
               <select
                 value={qualityMode}
                 onChange={(e) => setQualityMode(e.target.value as UploadQualityMode)}
-                className="text-[11px] font-bold bg-white border border-emerald-300 text-emerald-900 rounded px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+                className="w-full max-w-full min-w-0 truncate text-[11px] font-bold bg-white border border-emerald-300 text-emerald-900 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
               >
-                <option value="original">💎 Original Exact Quality (100% Untouched — No Blur)</option>
-                <option value="4k_ultra">✨ 4K Upscale (3840p Super-Resolution)</option>
-                <option value="2k_hd">⚡ 2K Upscale (2560p QHD)</option>
+                <option value="original">Original Quality (Exact)</option>
+                <option value="4k_ultra">4K Upscale (3840p)</option>
+                <option value="2k_hd">2K Upscale (2560p)</option>
               </select>
             </div>
           )}
@@ -521,7 +521,7 @@ export function AdminImageUploader({
               {isUploading ? (
                 <>
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  <span>{statusText || 'Processing 4K...'}</span>
+                  <span>{statusText || 'Uploading...'}</span>
                 </>
               ) : (
                 <>
@@ -532,8 +532,8 @@ export function AdminImageUploader({
                         ? 'Upload New PDF'
                         : 'Upload PDF'
                       : value
-                      ? 'Upload New (4K HD)'
-                      : 'Upload in 4K HD'}
+                      ? 'Upload New'
+                      : 'Upload Image'}
                   </span>
                 </>
               )}
@@ -777,11 +777,11 @@ export function AdminGalleryUploader({
             <select
               value={qualityMode}
               onChange={(e) => setQualityMode(e.target.value as UploadQualityMode)}
-              className="text-[11px] font-bold bg-white border border-emerald-300 text-emerald-900 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+              className="max-w-full min-w-0 truncate text-[11px] font-bold bg-white border border-emerald-300 text-emerald-900 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
             >
-              <option value="original">💎 Original Exact Quality (100% Untouched — No Blur)</option>
-              <option value="4k_ultra">✨ 4K Upscale (3840p Super-Resolution)</option>
-              <option value="2k_hd">⚡ 2K Upscale (2560p QHD)</option>
+              <option value="original">Original Quality (Exact)</option>
+              <option value="4k_ultra">4K Upscale (3840p)</option>
+              <option value="2k_hd">2K Upscale (2560p)</option>
             </select>
           </div>
 
