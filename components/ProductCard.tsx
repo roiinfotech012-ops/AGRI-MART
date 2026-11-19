@@ -33,6 +33,7 @@ export default function ProductCard({
   const [internalSubsidyOpen, setInternalSubsidyOpen] = useState(false);
   const fallbackImg = getDefaultCategoryImage(product.category);
   const primaryImg = product.thumbnailImage || (product.images && product.images[0]) || fallbackImg;
+  const secondaryImg = (product.images && product.images.length > 1) ? product.images[1] : null;
   const [imgSrc, setImgSrc] = useState(primaryImg);
 
   // Sync image source whenever product changes or filters are applied
@@ -134,26 +135,70 @@ export default function ProductCard({
         </div>
       ) : (
         /* ================= 3x3 LARGER VERTICAL CARD STYLE ================= */
-        <div className="group relative bg-white rounded-xl sm:rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-lg hover:border-emerald-300/90 transition-shadow duration-200 p-3 sm:p-4 flex flex-col justify-between overflow-hidden">
+        <div className="group relative bg-white rounded-xl sm:rounded-2xl border border-gray-200/80 shadow-xs hover:shadow-2xl hover:border-emerald-200/80 hover:-translate-y-1 active:scale-[0.99] transition-all duration-300 ease-out p-3 sm:p-4 flex flex-col justify-between overflow-hidden">
           
-          {/* Top: Product Visual (Static, crisp product photo) */}
-          <div className="relative w-full aspect-square bg-white flex items-center justify-center p-2.5 sm:p-3.5 overflow-hidden">
+          {/* Top: Product Visual (Standardized aspect-square with even padding for balanced image scale) */}
+          <div className="relative w-full aspect-square bg-white flex items-center justify-center p-2.5 sm:p-3.5 overflow-hidden [perspective:1000px]">
             {/* Central HD Product Photo */}
             <Link 
               href={`/products/${product.id}`}
               className="relative w-full h-full flex items-center justify-center z-1"
             >
-              <Image
-                src={imgSrc}
-                alt={product.name}
-                fill
-                unoptimized
-                quality={100}
-                loading="lazy"
-                onError={handleImageError}
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
-                className="object-contain p-1 sm:p-1.5"
-              />
+              {secondaryImg ? (
+                /* Multi-image: crossfade to next image with zoom on hover */
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <Image
+                    src={imgSrc}
+                    alt={product.name}
+                    fill
+                    unoptimized
+                    quality={100}
+                    loading="lazy"
+                    onError={handleImageError}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-contain p-1 sm:p-1.5 transition-all duration-500 ease-out group-hover:opacity-0 group-hover:scale-95"
+                  />
+                  <Image
+                    src={secondaryImg}
+                    alt={`${product.name} alternate view`}
+                    fill
+                    unoptimized
+                    quality={100}
+                    loading="lazy"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-contain p-1 sm:p-1.5 transition-all duration-500 ease-out opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-105"
+                  />
+                </div>
+              ) : (
+                /* Single-image: 3D flip card effect on hover */
+                <div className="relative w-full h-full transition-transform duration-700 ease-in-out [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                  <div className="absolute inset-0 flex items-center justify-center [backface-visibility:hidden]">
+                    <Image
+                      src={imgSrc}
+                      alt={product.name}
+                      fill
+                      unoptimized
+                      quality={100}
+                      loading="lazy"
+                      onError={handleImageError}
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-contain p-1 sm:p-1.5 transition-transform duration-500 ease-out group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center [transform:rotateY(180deg)] [backface-visibility:hidden]">
+                    <Image
+                      src={imgSrc}
+                      alt={`${product.name} flipped`}
+                      fill
+                      unoptimized
+                      quality={100}
+                      loading="lazy"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-contain p-1 sm:p-1.5 scale-x-[-1] transition-transform duration-500 ease-out group-hover:scale-105"
+                    />
+                  </div>
+                </div>
+              )}
             </Link>
           </div>
 
