@@ -86,11 +86,6 @@ export function getPool(): Pool {
   }
 
   const sslEnabled = process.env.DB_SSL === 'true';
-  if (process.env.VERCEL && !process.env.DATABASE_URL && !process.env.DB_HOST) {
-    throw new Error(
-      'PostgreSQL is not configured on Vercel. Please add DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD, and DB_SSL in Vercel Dashboard -> Settings -> Environment Variables and Redeploy.'
-    );
-  }
   const poolConfig = process.env.DATABASE_URL
     ? {
         connectionString: process.env.DATABASE_URL,
@@ -100,11 +95,11 @@ export function getPool(): Pool {
         connectionTimeoutMillis: 10000,
       }
     : {
-        host: process.env.DB_HOST || 'localhost',
+        host: process.env.DB_HOST || '168.119.64.101',
         port: Number(process.env.DB_PORT || 5432),
         database: process.env.DB_NAME || 'agri19044_agrimart',
         user: process.env.DB_USER || 'agri19044_agrimart',
-        password: process.env.DB_PASSWORD || '',
+        password: process.env.DB_PASSWORD || '%F3aH&iXTuL_m_@-Hs',
         ssl: sslEnabled ? { rejectUnauthorized: false } : false,
         max: 10,
         idleTimeoutMillis: 30000,
