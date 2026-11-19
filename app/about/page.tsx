@@ -31,8 +31,8 @@ export default async function AboutPage() {
         </div>
 
         {/* Section 1: Welcome to Ratnagiri Impex */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center mb-16">
-          <div className="lg:col-span-6 space-y-4">
+        <div className="space-y-8 mb-16">
+          <div className="space-y-4">
             <span className="text-xs font-bold text-[#0d9749] uppercase tracking-wider">
               {about.subtitle || 'ABOUT RATNAGIRI IMPEX PVT. LTD.'}
             </span>
@@ -57,7 +57,7 @@ export default async function AboutPage() {
             </div>
           </div>
 
-          <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Showroom Image Card */}
             <div className="group relative rounded-2xl overflow-hidden border border-gray-200/90 shadow-md bg-white">
               <div className="relative w-full aspect-[16/10]">
