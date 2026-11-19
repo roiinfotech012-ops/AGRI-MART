@@ -346,20 +346,62 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             {activeTab === 'video' && (
               <div className="py-2">
                 {product.videos && product.videos.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {product.videos.map((vid, idx) => (
-                      <div key={idx} className="border border-gray-200 rounded-lg p-4 bg-gray-50/70">
-                        <h4 className="font-bold text-xs text-gray-900 mb-2">{vid.title}</h4>
-                        <a
-                          href={vid.videoUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-green-700 hover:underline font-semibold"
-                        >
-                          Watch Demonstration Video →
-                        </a>
-                      </div>
-                    ))}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {product.videos.map((vid, idx) => {
+                      const rawUrl = (vid.videoUrl || '').trim();
+                      const ytMatch = rawUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([A-Za-z0-9_-]{6,})/);
+                      const isUploadedOrDirectVideo =
+                        rawUrl.startsWith('/api/uploads/') ||
+                        rawUrl.startsWith('/uploads/') ||
+                        rawUrl.startsWith('data:video/') ||
+                        /\.(mp4|webm|mov|m4v|ogg)(\?|$)/i.test(rawUrl);
+
+                      return (
+                        <div key={idx} className="border border-gray-200 rounded-lg p-4 bg-white shadow-2xs space-y-3">
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="font-bold text-xs text-gray-900">{vid.title || 'Product Demonstration Video'}</h4>
+                            {rawUrl && (
+                              <a
+                                href={rawUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[11px] text-[#0d9749] hover:underline font-bold shrink-0"
+                              >
+                                Open Video ↗
+                              </a>
+                            )}
+                          </div>
+
+                          {ytMatch ? (
+                            <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black">
+                              <iframe
+                                src={`https://www.youtube.com/embed/${ytMatch[1]}`}
+                                title={vid.title || 'Product Video'}
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                className="w-full h-full border-0"
+                              />
+                            </div>
+                          ) : isUploadedOrDirectVideo ? (
+                            <video
+                              src={rawUrl}
+                              controls
+                              preload="metadata"
+                              className="w-full aspect-video rounded-lg bg-black object-contain"
+                            />
+                          ) : (
+                            <a
+                              href={rawUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-xs bg-[#0d9749] hover:bg-green-800 text-white font-bold px-4 py-2 rounded transition-colors"
+                            >
+                              Watch Demonstration Video →
+                            </a>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="p-4 bg-gray-50/80 rounded-lg border border-gray-200 text-xs text-gray-600">

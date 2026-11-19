@@ -12,6 +12,11 @@ const MIME_MAP: Record<string, string> = {
   '.gif': 'image/gif',
   '.avif': 'image/avif',
   '.pdf': 'application/pdf',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
+  '.mov': 'video/quicktime',
+  '.m4v': 'video/x-m4v',
+  '.ogg': 'video/ogg',
 };
 
 export async function POST(req: NextRequest) {

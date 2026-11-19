@@ -191,8 +191,15 @@ export default function AdminPage() {
   // Product Edit / Create Modal State
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isNewProduct, setIsNewProduct] = useState(false);
-  const [activeEditTab, setActiveEditTab] = useState<'basic' | 'images' | 'specs' | 'brochures' | 'desc'>('basic');
+  const [activeEditTab, setActiveEditTab] = useState<'basic' | 'images' | 'accessories' | 'videos' | 'brochures' | 'desc'>('basic');
   const [editSpecs, setEditSpecs] = useState<Array<{ key: string; value: string }>>([]);
+  const [editAccessories, setEditAccessories] = useState<Array<{ name: string; included: boolean }>>([]);
+  const [newAccessoryName, setNewAccessoryName] = useState('');
+  const [newAccessoryIncluded, setNewAccessoryIncluded] = useState(true);
+  const [editVideos, setEditVideos] = useState<Array<{ title: string; videoUrl: string }>>([]);
+  const [newVideoTitle, setNewVideoTitle] = useState('');
+  const [newVideoUrl, setNewVideoUrl] = useState('');
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
   const [editImages, setEditImages] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [editBrochures, setEditBrochures] = useState<Array<{ language: string; url: string; name: string }>>([]);
@@ -285,6 +292,12 @@ export default function AdminPage() {
     setSaveSuccessMsg(null);
     setNewImageUrl('');
     setEditBrochures(Array.isArray(p.brochures) ? [...p.brochures] : []);
+    setEditAccessories(Array.isArray(p.accessories) ? [...p.accessories] : []);
+    setNewAccessoryName('');
+    setNewAccessoryIncluded(true);
+    setEditVideos(Array.isArray(p.videos) ? [...p.videos] : []);
+    setNewVideoTitle('');
+    setNewVideoUrl('');
     setNewBrochureLang('English');
     setCustomBrochureLang('');
     setNewBrochureName('');
@@ -337,6 +350,12 @@ export default function AdminPage() {
     setSaveSuccessMsg(null);
     setNewImageUrl('');
     setEditBrochures([]);
+    setEditAccessories([]);
+    setNewAccessoryName('');
+    setNewAccessoryIncluded(true);
+    setEditVideos([]);
+    setNewVideoTitle('');
+    setNewVideoUrl('');
     setNewBrochureLang('English');
     setCustomBrochureLang('');
     setNewBrochureName('');
@@ -389,12 +408,32 @@ export default function AdminPage() {
       }
     }
 
+    // Automatically include any pending accessory or video if filled
+    const mergedAccessories = [...editAccessories];
+    if (newAccessoryName.trim()) {
+      mergedAccessories.push({
+        name: newAccessoryName.trim(),
+        included: newAccessoryIncluded,
+      });
+    }
+
+    const mergedVideos = [...editVideos];
+    if (newVideoUrl.trim()) {
+      const pendingVideoUrl = newVideoUrl.trim();
+      const pendingVideoTitle = newVideoTitle.trim() || `${editingProduct.name || 'Product'} Demonstration Video`;
+      if (!mergedVideos.some(v => v.videoUrl.trim() === pendingVideoUrl)) {
+        mergedVideos.push({ title: pendingVideoTitle, videoUrl: pendingVideoUrl });
+      }
+    }
+
     const payload: Product = {
       ...editingProduct,
       slug: editingProduct.slug || editingProduct.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
       thumbnailImage: editImages[0] || editingProduct.thumbnailImage || '/assets/branding/logo.png',
       images: editImages.length > 0 ? editImages : [editingProduct.thumbnailImage || '/assets/branding/logo.png'],
       specifications: specsRecord,
+      accessories: mergedAccessories.filter(a => a && a.name && a.name.trim() !== ''),
+      videos: mergedVideos.filter(v => v && v.videoUrl && v.videoUrl.trim() !== ''),
       brochures: mergedBrochures.filter(b => b && b.url && b.url.trim() !== ''),
     };
 
@@ -4571,12 +4610,20 @@ export default function AdminPage() {
                     2. Photos & Media ({editImages.length})
                   </button>
                   <button
-                    onClick={() => setActiveEditTab('specs')}
+                    onClick={() => setActiveEditTab('accessories')}
                     className={`py-3 px-3 border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
-                      activeEditTab === 'specs' ? 'border-[#0d9749] text-[#0d9749]' : 'border-transparent text-gray-600 hover:text-gray-900'
+                      activeEditTab === 'accessories' ? 'border-[#0d9749] text-[#0d9749]' : 'border-transparent text-gray-600 hover:text-gray-900'
                     }`}
                   >
-                    3. Technical Specs ({editSpecs.length})
+                    3. Accessories ({editAccessories.length})
+                  </button>
+                  <button
+                    onClick={() => setActiveEditTab('videos')}
+                    className={`py-3 px-3 border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
+                      activeEditTab === 'videos' ? 'border-[#0d9749] text-[#0d9749]' : 'border-transparent text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    4. Videos ({editVideos.length})
                   </button>
                   <button
                     onClick={() => setActiveEditTab('brochures')}
@@ -4585,7 +4632,7 @@ export default function AdminPage() {
                     }`}
                   >
                     <FileText className="w-3.5 h-3.5" />
-                    <span>4. Multi-Language Brochures ({editBrochures.length})</span>
+                    <span>5. Multi-Language Brochures ({editBrochures.length})</span>
                   </button>
                   <button
                     onClick={() => setActiveEditTab('desc')}
@@ -4593,7 +4640,7 @@ export default function AdminPage() {
                       activeEditTab === 'desc' ? 'border-[#0d9749] text-[#0d9749]' : 'border-transparent text-gray-600 hover:text-gray-900'
                     }`}
                   >
-                    5. Description & Overview
+                    6. Description & Overview
                   </button>
                 </div>
 
@@ -4783,61 +4830,268 @@ export default function AdminPage() {
                     </div>
                   )}
 
-                  {/* TAB 4: TECHNICAL SPECIFICATIONS */}
-                  {activeEditTab === 'specs' && (
+                  {/* TAB 3: ACCESSORIES */}
+                  {activeEditTab === 'accessories' && (
                     <div className="space-y-4">
-                      <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-lg text-emerald-900 text-xs">
-                        <p className="font-bold">Comprehensive Machinery Specifications</p>
+                      <div className="bg-emerald-50 border border-emerald-200 p-3.5 rounded-lg text-emerald-900 text-xs">
+                        <p className="font-bold">Standard &amp; Compatible Accessories ({editAccessories.length})</p>
                         <p className="text-[11px] text-emerald-800 mt-0.5">
-                          Add or adjust technical attributes (Engine Displacement, HP, Cutting Width, Weight, Tank Capacity, Fuel Ratio, etc.) shown on the product detail page.
+                          Manage included standard accessories and compatible attachments shown in the &quot;Accessories&quot; tab on the live product page.
                         </p>
                       </div>
 
-                      <div className="space-y-2">
-                        {editSpecs.map((spec, sIdx) => (
-                          <div key={sIdx} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg border border-gray-200">
+                      {/* Add Accessory Form */}
+                      <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3">
+                        <label className="block font-bold text-gray-800 text-xs">Add New Accessory</label>
+                        <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center">
+                          <input
+                            type="text"
+                            value={newAccessoryName}
+                            onChange={(e) => setNewAccessoryName(e.target.value)}
+                            placeholder="e.g. Heavy Duty Harness, Nylon Trimmer Head, Tool Kit..."
+                            className="flex-1 px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                          />
+                          <label className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 cursor-pointer shrink-0">
                             <input
-                              type="text"
-                              value={spec.key}
-                              placeholder="Spec Name (e.g. Engine Type)"
-                              onChange={(e) => {
-                                const copy = [...editSpecs];
-                                copy[sIdx].key = e.target.value;
-                                setEditSpecs(copy);
-                              }}
-                              className="w-1/3 px-3 py-1.5 border border-gray-300 rounded text-xs font-semibold bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                              type="checkbox"
+                              checked={newAccessoryIncluded}
+                              onChange={(e) => setNewAccessoryIncluded(e.target.checked)}
+                              className="rounded text-emerald-600"
                             />
-                            <input
-                              type="text"
-                              value={spec.value}
-                              placeholder="Spec Value (e.g. 2-Stroke, 51.7 cc)"
-                              onChange={(e) => {
-                                const copy = [...editSpecs];
-                                copy[sIdx].value = e.target.value;
-                                setEditSpecs(copy);
-                              }}
-                              className="flex-1 px-3 py-1.5 border border-gray-300 rounded text-xs bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setEditSpecs(editSpecs.filter((_, idx) => idx !== sIdx))}
-                              className="p-1.5 text-red-500 hover:bg-red-50 hover:text-red-700 rounded transition-colors"
-                              title="Delete this specification"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ))}
+                            <span>Included Standard</span>
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!newAccessoryName.trim()) {
+                                alert('Please enter an accessory name');
+                                return;
+                              }
+                              setEditAccessories([
+                                ...editAccessories,
+                                { name: newAccessoryName.trim(), included: newAccessoryIncluded },
+                              ]);
+                              setNewAccessoryName('');
+                              setNewAccessoryIncluded(true);
+                            }}
+                            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#0d9749] hover:bg-[#097b3a] text-white font-bold rounded-lg text-xs transition-colors shrink-0 cursor-pointer"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>Add Accessory</span>
+                          </button>
+                        </div>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => setEditSpecs([...editSpecs, { key: '', value: '' }])}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-lg text-xs transition-colors"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>+ Add Specification Field</span>
-                      </button>
+                      {/* Existing Accessories List */}
+                      {editAccessories.length === 0 ? (
+                        <div className="p-8 text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 text-gray-500 text-xs">
+                          No accessories added for this machine yet. Add accessories above.
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {editAccessories.map((acc, aIdx) => (
+                            <div
+                              key={aIdx}
+                              className="flex items-center gap-2.5 bg-white p-2.5 rounded-lg border border-gray-200 hover:border-emerald-300 transition-colors"
+                            >
+                              <CheckCircle2
+                                className={`w-4 h-4 shrink-0 ${
+                                  acc.included !== false ? 'text-emerald-600' : 'text-gray-300'
+                                }`}
+                              />
+                              <input
+                                type="text"
+                                value={acc.name}
+                                onChange={(e) => {
+                                  const copy = [...editAccessories];
+                                  copy[aIdx] = { ...copy[aIdx], name: e.target.value };
+                                  setEditAccessories(copy);
+                                }}
+                                className="flex-1 px-2.5 py-1.5 border border-gray-200 rounded text-xs font-semibold bg-gray-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                              />
+                              <label className="inline-flex items-center gap-1 text-[11px] font-semibold text-gray-600 cursor-pointer shrink-0">
+                                <input
+                                  type="checkbox"
+                                  checked={acc.included !== false}
+                                  onChange={(e) => {
+                                    const copy = [...editAccessories];
+                                    copy[aIdx] = { ...copy[aIdx], included: e.target.checked };
+                                    setEditAccessories(copy);
+                                  }}
+                                  className="rounded text-emerald-600"
+                                />
+                                <span>Included</span>
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => setEditAccessories(editAccessories.filter((_, idx) => idx !== aIdx))}
+                                className="p-1.5 text-red-500 hover:bg-red-50 hover:text-red-700 rounded transition-colors cursor-pointer"
+                                title="Remove accessory"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* TAB 4: VIDEOS (UPLOAD & LINK) */}
+                  {activeEditTab === 'videos' && (
+                    <div className="space-y-5">
+                      <div className="bg-emerald-50 border border-emerald-200 p-3.5 rounded-lg text-emerald-900 text-xs">
+                        <p className="font-bold">Product Demonstration &amp; Operational Videos ({editVideos.length})</p>
+                        <p className="text-[11px] text-emerald-800 mt-0.5">
+                          Upload a video directly from your computer (MP4, WebM, MOV) or paste a YouTube / external video link. Videos display in the &quot;Video&quot; tab on the product page.
+                        </p>
+                      </div>
+
+                      {/* Add Video Form (Upload + Link) */}
+                      <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3.5">
+                        <h4 className="font-bold text-gray-900 text-xs">Add Product Video (Upload File or Paste Link)</h4>
+
+                        <div>
+                          <label className="block font-bold text-gray-700 mb-1">Video Title</label>
+                          <input
+                            type="text"
+                            value={newVideoTitle}
+                            onChange={(e) => setNewVideoTitle(e.target.value)}
+                            placeholder={`e.g. ${editingProduct.name || 'Machine'} Demo & Assembly Video`}
+                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {/* Option A: Upload Video File */}
+                          <div className="bg-white border border-gray-200 rounded-lg p-3 space-y-2">
+                            <label className="block font-bold text-emerald-800 text-[11px] uppercase tracking-wider">
+                              Option 1: Upload Video File
+                            </label>
+                            <input
+                              type="file"
+                              accept="video/mp4,video/webm,video/quicktime,video/*"
+                              disabled={isUploadingVideo}
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                setIsUploadingVideo(true);
+                                try {
+                                  const fd = new FormData();
+                                  fd.append('file', file);
+                                  fd.append('folder', 'videos');
+                                  const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+                                  const data = await res.json();
+                                  if (data.success && data.url) {
+                                    setNewVideoUrl(data.url);
+                                    if (!newVideoTitle.trim()) {
+                                      setNewVideoTitle(file.name.replace(/\.[^/.]+$/, ''));
+                                    }
+                                  } else {
+                                    alert(data.error || 'Failed to upload video.');
+                                  }
+                                } catch (err: any) {
+                                  alert('Video upload error: ' + (err.message || 'File may exceed serverless size limit (4.5MB). For larger videos, paste a YouTube or HTTPS video link.'));
+                                } finally {
+                                  setIsUploadingVideo(false);
+                                  e.target.value = '';
+                                }
+                              }}
+                              className="w-full text-[11px] text-gray-600 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-800 hover:file:bg-emerald-100 cursor-pointer"
+                            />
+                            <p className="text-[10px] text-gray-400">
+                              {isUploadingVideo ? 'Uploading video...' : 'Supports MP4, WebM, MOV (up to 4MB direct upload).'}
+                            </p>
+                          </div>
+
+                          {/* Option B: Paste Video URL / YouTube Link */}
+                          <div className="bg-white border border-gray-200 rounded-lg p-3 space-y-2">
+                            <label className="block font-bold text-blue-800 text-[11px] uppercase tracking-wider">
+                              Option 2: Video / YouTube Link
+                            </label>
+                            <input
+                              type="text"
+                              value={newVideoUrl}
+                              onChange={(e) => setNewVideoUrl(e.target.value)}
+                              placeholder="https://www.youtube.com/watch?v=... or https://..."
+                              className="w-full px-3 py-1.5 bg-gray-50 border border-gray-300 rounded text-xs font-mono focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                            />
+                            <p className="text-[10px] text-gray-400">
+                              YouTube links auto-embed as a player on the product page.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            disabled={isUploadingVideo}
+                            onClick={() => {
+                              if (!newVideoUrl.trim()) {
+                                alert('Please upload a video file or paste a video link');
+                                return;
+                              }
+                              const title = newVideoTitle.trim() || `${editingProduct.name || 'Product'} Demonstration Video`;
+                              setEditVideos([...editVideos, { title, videoUrl: newVideoUrl.trim() }]);
+                              setNewVideoTitle('');
+                              setNewVideoUrl('');
+                            }}
+                            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0d9749] hover:bg-[#097b3a] disabled:opacity-60 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>Add Video</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Configured Videos List */}
+                      {editVideos.length === 0 ? (
+                        <div className="p-8 text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 text-gray-500 text-xs">
+                          No videos added yet. Upload a video file or add a YouTube/video link above.
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {editVideos.map((vid, vIdx) => {
+                            const isDirectVideo =
+                              vid.videoUrl.startsWith('/api/uploads/') ||
+                              vid.videoUrl.startsWith('/uploads/') ||
+                              vid.videoUrl.startsWith('data:video/') ||
+                              /\.(mp4|webm|mov|m4v|ogg)(\?|$)/i.test(vid.videoUrl);
+
+                            return (
+                              <div key={vIdx} className="bg-white border border-gray-200 rounded-xl p-3 space-y-2 shadow-2xs">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="min-w-0">
+                                    <h5 className="font-bold text-xs text-gray-900 truncate">{vid.title}</h5>
+                                    <p className="text-[10px] text-gray-500 font-mono truncate mt-0.5">{vid.videoUrl}</p>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditVideos(editVideos.filter((_, idx) => idx !== vIdx))}
+                                    className="p-1 text-red-500 hover:bg-red-50 hover:text-red-700 rounded transition-colors cursor-pointer shrink-0"
+                                    title="Remove video"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                                {isDirectVideo ? (
+                                  <video src={vid.videoUrl} controls className="w-full aspect-video rounded bg-black object-contain" />
+                                ) : (
+                                  <a
+                                    href={vid.videoUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-[11px] text-[#0d9749] hover:underline font-bold"
+                                  >
+                                    <ExternalLink className="w-3 h-3" />
+                                    <span>Test Video Link</span>
+                                  </a>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   )}
 
