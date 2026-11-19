@@ -417,11 +417,23 @@ export default function AdminPage() {
       });
     }
 
-    const mergedVideos = [...editVideos];
+    const normalizeVideoLink = (u: string) => {
+      const trimmed = u.trim();
+      if (!trimmed) return '';
+      if (trimmed.startsWith('/') || trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:')) {
+        return trimmed;
+      }
+      return `https://${trimmed}`;
+    };
+
+    const mergedVideos = editVideos.map(v => ({
+      title: v.title || `${editingProduct.name || 'Product'} Demonstration Video`,
+      videoUrl: normalizeVideoLink(v.videoUrl || ''),
+    }));
     if (newVideoUrl.trim()) {
-      const pendingVideoUrl = newVideoUrl.trim();
+      const pendingVideoUrl = normalizeVideoLink(newVideoUrl);
       const pendingVideoTitle = newVideoTitle.trim() || `${editingProduct.name || 'Product'} Demonstration Video`;
-      if (!mergedVideos.some(v => v.videoUrl.trim() === pendingVideoUrl)) {
+      if (!mergedVideos.some(v => v.videoUrl === pendingVideoUrl)) {
         mergedVideos.push({ title: pendingVideoTitle, videoUrl: pendingVideoUrl });
       }
     }

@@ -6,7 +6,7 @@ import { Product } from '@/types';
 import ProductDetailClient from '@/components/ProductDetailClient';
 
 export const dynamicParams = true;
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 async function resolveProduct(id: string): Promise<Product | undefined> {
   try {

@@ -216,7 +216,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   : 'bg-transparent text-gray-600 hover:text-gray-900 font-semibold'
               }`}
             >
-              Video
+              Video{product.videos && product.videos.length > 0 ? ` (${product.videos.length})` : ''}
             </button>
           </div>
 
@@ -348,8 +348,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 {product.videos && product.videos.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {product.videos.map((vid, idx) => {
-                      const rawUrl = (vid.videoUrl || '').trim();
-                      const ytMatch = rawUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([A-Za-z0-9_-]{6,})/);
+                      let rawUrl = (vid.videoUrl || (vid as any).url || '').trim();
+                      if (rawUrl && !rawUrl.startsWith('/') && !rawUrl.startsWith('http://') && !rawUrl.startsWith('https://') && !rawUrl.startsWith('data:')) {
+                        rawUrl = `https://${rawUrl}`;
+                      }
+                      const ytMatch = rawUrl.match(
+                        /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/i
+                      );
+                      const vimeoMatch = rawUrl.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
                       const isUploadedOrDirectVideo =
                         rawUrl.startsWith('/api/uploads/') ||
                         rawUrl.startsWith('/uploads/') ||
@@ -378,6 +384,16 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                 src={`https://www.youtube.com/embed/${ytMatch[1]}`}
                                 title={vid.title || 'Product Video'}
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                className="w-full h-full border-0"
+                              />
+                            </div>
+                          ) : vimeoMatch ? (
+                            <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black">
+                              <iframe
+                                src={`https://player.vimeo.com/video/${vimeoMatch[1]}`}
+                                title={vid.title || 'Product Video'}
+                                allow="autoplay; fullscreen; picture-in-picture"
                                 allowFullScreen
                                 className="w-full h-full border-0"
                               />
