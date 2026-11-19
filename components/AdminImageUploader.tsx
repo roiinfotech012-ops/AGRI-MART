@@ -305,7 +305,7 @@ export function AdminImageUploader({
 }: AdminImageUploaderProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [statusText, setStatusText] = useState<string>('');
-  const [qualityMode, setQualityMode] = useState<UploadQualityMode>('4k_ultra');
+  const [qualityMode, setQualityMode] = useState<UploadQualityMode>('original');
   const [showManualInput, setShowManualInput] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [imageDims, setImageDims] = useState<{ w: number; h: number } | null>(null);
@@ -342,18 +342,16 @@ export function AdminImageUploader({
     setIsUploading(true);
     try {
       let fileToUpload = rawFile;
-      if (!isPdfAccept && !rawFile.name.toLowerCase().endsWith('.pdf')) {
+      if (!isPdfAccept && !rawFile.name.toLowerCase().endsWith('.pdf') && activeMode !== 'original') {
         setStatusText(
           activeMode === '4k_ultra'
             ? 'Upscaling & sharpening to 4K Ultra-HD (3840p)...'
-            : activeMode === '2k_hd'
-            ? 'Enhancing to 2K Studio HD (2560p)...'
-            : 'Preparing lossless HD image...'
+            : 'Enhancing to 2K Studio HD (2560p)...'
         );
         fileToUpload = await processImageTo4K(rawFile, rawFile.name, activeMode);
       }
 
-      setStatusText('Uploading 4K HD asset to server...');
+      setStatusText('Uploading original quality asset...');
       const formData = new FormData();
       formData.append('file', fileToUpload);
       formData.append('folder', folder);
@@ -498,9 +496,9 @@ export function AdminImageUploader({
                 onChange={(e) => setQualityMode(e.target.value as UploadQualityMode)}
                 className="text-[11px] font-bold bg-white border border-emerald-300 text-emerald-900 rounded px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
               >
-                <option value="4k_ultra">✨ 4K Ultra-HD (3840p Super-Resolution + Crisp)</option>
-                <option value="2k_hd">⚡ 2K Studio HD (2560p QHD Crisp)</option>
-                <option value="original">💎 Original Uncompressed (Native Raw)</option>
+                <option value="original">💎 Original Exact Quality (100% Untouched — No Blur)</option>
+                <option value="4k_ultra">✨ 4K Upscale (3840p Super-Resolution)</option>
+                <option value="2k_hd">⚡ 2K Upscale (2560p QHD)</option>
               </select>
             </div>
           )}
@@ -656,7 +654,7 @@ export function AdminGalleryUploader({
 }: AdminGalleryUploaderProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [statusText, setStatusText] = useState('');
-  const [qualityMode, setQualityMode] = useState<UploadQualityMode>('4k_ultra');
+  const [qualityMode, setQualityMode] = useState<UploadQualityMode>('original');
   const [isDragOver, setIsDragOver] = useState(false);
   const [newUrlInput, setNewUrlInput] = useState('');
   const [showUrlInput, setShowUrlInput] = useState(false);
@@ -685,16 +683,20 @@ export function AdminGalleryUploader({
 
       for (let i = 0; i < rawArray.length; i++) {
         const f = rawArray[i];
-        setStatusText(
-          `Enhancing photo ${i + 1} of ${rawArray.length} to ${
-            qualityMode === '4k_ultra' ? '4K Ultra-HD (3840p)' : qualityMode === '2k_hd' ? '2K Studio HD' : 'Lossless HD'
-          }...`
-        );
-        const enhanced = await processImageTo4K(f, f.name, qualityMode);
-        processedFiles.push(enhanced);
+        if (qualityMode === 'original') {
+          processedFiles.push(f);
+        } else {
+          setStatusText(
+            `Enhancing photo ${i + 1} of ${rawArray.length} to ${
+              qualityMode === '4k_ultra' ? '4K Ultra-HD (3840p)' : '2K Studio HD'
+            }...`
+          );
+          const enhanced = await processImageTo4K(f, f.name, qualityMode);
+          processedFiles.push(enhanced);
+        }
       }
 
-      setStatusText(`Uploading ${processedFiles.length} 4K HD photo(s)...`);
+      setStatusText(`Uploading ${processedFiles.length} original quality photo(s)...`);
       const formData = new FormData();
       processedFiles.forEach((f) => formData.append('files', f));
       formData.append('folder', folder);
@@ -765,7 +767,7 @@ export function AdminGalleryUploader({
             Product Gallery Photos ({images.length})
           </label>
           <span className="text-[10px] font-extrabold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-300">
-            4K ULTRA-HD PIPELINE ACTIVE
+            100% ORIGINAL QUALITY PRESERVED
           </span>
         </div>
 
@@ -777,9 +779,9 @@ export function AdminGalleryUploader({
               onChange={(e) => setQualityMode(e.target.value as UploadQualityMode)}
               className="text-[11px] font-bold bg-white border border-emerald-300 text-emerald-900 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
             >
-              <option value="4k_ultra">✨ 4K Ultra-HD (3840p Super-Resolution + Crisp)</option>
-              <option value="2k_hd">⚡ 2K Studio HD (2560p QHD Crisp)</option>
-              <option value="original">💎 Original Uncompressed (Native Raw)</option>
+              <option value="original">💎 Original Exact Quality (100% Untouched — No Blur)</option>
+              <option value="4k_ultra">✨ 4K Upscale (3840p Super-Resolution)</option>
+              <option value="2k_hd">⚡ 2K Upscale (2560p QHD)</option>
             </select>
           </div>
 
