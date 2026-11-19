@@ -59,18 +59,13 @@ export default async function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Showroom Image Card */}
-            <div className="group relative rounded-2xl overflow-hidden border border-gray-200/90 shadow-md bg-white">
-              <div className="relative w-full aspect-[16/10]">
-                <Image
+            <div className="relative rounded-2xl overflow-hidden border border-gray-200/90 shadow-md bg-white">
+              <div className="relative w-full aspect-[16/10] bg-white flex items-center justify-center">
+                <img
                   src={about.showroomImage || '/assets/about/agrimart_mega_showroom.jpg'}
                   alt="Ratnagiri Impex & Agrimart Mega Showroom"
-                  fill
-                  priority
-                  unoptimized
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                  className="max-w-full max-h-full w-auto h-auto object-contain object-center"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                 <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg text-white text-xs font-semibold flex items-center gap-2 border border-white/10 shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
                   Agrimart Mega Showroom
@@ -79,17 +74,13 @@ export default async function AboutPage() {
             </div>
 
             {/* Warehouse Facility Image Card */}
-            <div className="group relative rounded-2xl overflow-hidden border border-gray-200/90 shadow-md bg-white">
-              <div className="relative w-full aspect-[16/10]">
-                <Image
+            <div className="relative rounded-2xl overflow-hidden border border-gray-200/90 shadow-md bg-white">
+              <div className="relative w-full aspect-[16/10] bg-white flex items-center justify-center">
+                <img
                   src={about.warehouseImage || '/assets/about/ratnagiri_impex_warehouse.jpg'}
                   alt="Ratnagiri Impex Central Warehouse & Logistics Facility"
-                  fill
-                  unoptimized
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                  className="max-w-full max-h-full w-auto h-auto object-contain object-center"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                 <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg text-white text-xs font-semibold flex items-center gap-2 border border-white/10 shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
                   Ratnagiri Impex Central Warehouse &amp; Logistics

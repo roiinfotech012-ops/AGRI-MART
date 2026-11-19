@@ -455,18 +455,13 @@ export default function HomePage() {
         <section className="py-8 sm:py-12 bg-gradient-to-b from-white to-[#fbfdfa] border-t border-gray-200/70">
           <div className="agri-container">
             <div
-              className="relative w-full aspect-[1024/340] rounded-2xl sm:rounded-3xl overflow-hidden border border-emerald-950/10 shadow-md hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-500 select-none group"
+              className="relative w-full aspect-[1024/340] rounded-2xl sm:rounded-3xl overflow-hidden border border-emerald-950/10 bg-white shadow-md hover:shadow-xl transition-shadow duration-300 select-none flex items-center justify-center"
             >
-            {/* 3K Ultra-HD Banner Artwork (unoptimized for 100% loss-free HD clarity) */}
-            <Image
+            {/* Exact Original-Quality Banner Artwork (No Zoom, No Blur) */}
+            <img
               src={homeCms.appBanner?.bannerImage || "/assets/banners/app_download_banner_hd.png"}
               alt={homeCms.appBanner?.title || "Download Agrimart Mobile App — Get every farming solution in one place"}
-              fill
-              priority
-              unoptimized
-              quality={100}
-              sizes="(max-width: 1240px) 100vw, 1240px"
-              className="object-cover object-center pointer-events-none select-none"
+              className="max-w-full max-h-full w-auto h-auto object-contain object-center pointer-events-none select-none"
             />
 
             {/* The 2 Hyperlinked Buttons: Google Play & App Store */}

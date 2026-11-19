@@ -271,19 +271,14 @@ export default function TopPicksShowcase({ onOpenSubsidy, header, customPicks }:
                 {BRAND_PICKS.map((brand, bIdx) => (
                   <div
                     key={brand.id}
-                    className={`absolute inset-0 transition-opacity duration-500 ease-in-out ${
+                    className={`absolute inset-0 bg-white flex items-center justify-center transition-opacity duration-500 ease-in-out ${
                       bIdx === activeBrandIndex ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
                     }`}
                   >
-                    <Image
+                    <img
                       src={brand.bannerImage}
                       alt={`${brand.brand} - ${brand.tagline}`}
-                      fill
-                      priority
-                      unoptimized
-                      quality={100}
-                      sizes="(max-width: 768px) 100vw, 850px"
-                      className="object-cover object-center w-full h-full select-none"
+                      className="max-w-full max-h-full w-auto h-auto object-contain object-center select-none"
                     />
                   </div>
                 ))}
@@ -326,15 +321,11 @@ export default function TopPicksShowcase({ onOpenSubsidy, header, customPicks }:
               </h4>
 
               {/* Mini Banner Preview (Exact Aspect Ratio 1024/426) */}
-              <div className="relative w-full aspect-[1024/426] my-1.5 rounded-lg overflow-hidden border border-gray-200/80 bg-white shadow-2xs">
-                <Image
+              <div className="relative w-full aspect-[1024/426] my-1.5 rounded-lg overflow-hidden border border-gray-200/80 bg-white shadow-2xs flex items-center justify-center">
+                <img
                   src={nextBrand.bannerImage}
                   alt={nextBrand.brand}
-                  fill
-                  unoptimized
-                  quality={100}
-                  sizes="150px"
-                  className="object-cover group-hover:scale-105 transition-transform"
+                  className="max-w-full max-h-full w-auto h-auto object-contain"
                 />
               </div>
 
