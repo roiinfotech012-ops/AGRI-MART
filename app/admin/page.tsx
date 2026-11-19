@@ -62,6 +62,7 @@ import { AdminImageUploader, AdminGalleryUploader } from '@/components/AdminImag
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'categories' | 'dealers' | 'enquiries' | 'homepage' | 'aboutus' | 'contactus' | 'footer' | 'security'>('dashboard');
   const [productSearch, setProductSearch] = useState('');
+  const [productCategoryFilter, setProductCategoryFilter] = useState<string>('ALL');
   const [productPage, setProductPage] = useState(1);
   const adminPageSize = 20;
 
@@ -312,8 +313,15 @@ export default function AdminPage() {
     setEditImages(Array.isArray(p.images) && p.images.length > 0 ? [...p.images] : [p.thumbnailImage || '/assets/branding/logo.png']);
   };
 
-  const handleOpenAddProduct = () => {
-    const defaultCat = categories[0]?.name || 'POWER WEEDER & TILLERS';
+  const handleOpenAddProduct = (presetCategory?: string) => {
+    const validPreset =
+      typeof presetCategory === 'string' && presetCategory && presetCategory !== 'ALL'
+        ? presetCategory
+        : productCategoryFilter !== 'ALL'
+        ? productCategoryFilter
+        : '';
+    const defaultCat = validPreset || categories[0]?.name || 'POWER WEEDER & TILLERS';
+    const matchedCatObj = categories.find(c => c.name === defaultCat);
     const newProd: Product = {
       id: `prod_${Date.now()}`,
       name: '',
@@ -321,7 +329,7 @@ export default function AdminPage() {
       riplCode: '',
       brand: 'AGRIMATE',
       category: defaultCat,
-      subcategory: '',
+      subcategory: matchedCatObj?.subcategories?.[0] || '',
       mrp: 0,
       sellingPrice: 0,
       discountPercentage: 0,
@@ -1304,6 +1312,11 @@ export default function AdminPage() {
           {/* TAB: PRODUCTS */}
           {activeTab === 'products' && (() => {
             const filtered = products.filter(p => {
+              if (productCategoryFilter !== 'ALL') {
+                const normP = (p.category || '').replace(/\s+/g, ' ').trim().toLowerCase();
+                const normF = productCategoryFilter.replace(/\s+/g, ' ').trim().toLowerCase();
+                if (normP !== normF) return false;
+              }
               if (!productSearch) return true;
               const q = productSearch.toLowerCase();
               return p.name.toLowerCase().includes(q) || 
@@ -1318,16 +1331,23 @@ export default function AdminPage() {
               <div>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                   <div>
-                    <h1 className="text-xl font-bold text-gray-900">Products Catalogue ({products.length})</h1>
-                    <p className="text-xs text-gray-500">Every authentic product with complete real-time edit, media & spec controls</p>
+                    <h1 className="text-xl font-bold text-gray-900">
+                      Products Catalogue ({filtered.length}
+                      {productCategoryFilter !== 'ALL' ? ` in ${productCategoryFilter}` : ''})
+                    </h1>
+                    <p className="text-xs text-gray-500">Select any category below to view or add products category-wise</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={handleOpenAddProduct}
+                      onClick={() => handleOpenAddProduct(productCategoryFilter !== 'ALL' ? productCategoryFilter : undefined)}
                       className="bg-[#0d9749] hover:bg-[#097b3a] text-white text-xs font-bold px-3.5 py-2 rounded flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      <span>Add New Product</span>
+                      <span>
+                        {productCategoryFilter !== 'ALL'
+                          ? `Add Product in ${productCategoryFilter}`
+                          : 'Add New Product'}
+                      </span>
                     </button>
                     <a
                       href="/master_catalog_export.csv"
@@ -1337,6 +1357,100 @@ export default function AdminPage() {
                       <FileText className="w-3.5 h-3.5 text-gray-500" />
                       <span>Export CSV</span>
                     </a>
+                  </div>
+                </div>
+
+                {/* Category-Wise Selection & Quick Add Bar */}
+                <div className="bg-white p-3.5 rounded-lg border border-gray-200 mb-3 space-y-2.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                        Category-Wise Filter:
+                      </span>
+                      <select
+                        value={productCategoryFilter}
+                        onChange={(e) => {
+                          setProductCategoryFilter(e.target.value);
+                          setProductPage(1);
+                        }}
+                        className="px-3 py-1.5 bg-gray-50 border border-emerald-300 rounded-lg text-xs font-bold text-emerald-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none cursor-pointer"
+                      >
+                        <option value="ALL">All Categories ({products.length})</option>
+                        {categories.map((cat) => {
+                          const cnt = products.filter(
+                            (pr) => (pr.category || '').replace(/\s+/g, ' ').trim().toLowerCase() === cat.name.replace(/\s+/g, ' ').trim().toLowerCase()
+                          ).length;
+                          return (
+                            <option key={cat.id} value={cat.name}>
+                              {cat.name} ({cnt})
+                            </option>
+                          );
+                        })}
+                      </select>
+                      {productCategoryFilter !== 'ALL' && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProductCategoryFilter('ALL');
+                            setProductPage(1);
+                          }}
+                          className="text-[11px] font-semibold text-gray-500 hover:text-gray-800 underline cursor-pointer"
+                        >
+                          Clear Filter
+                        </button>
+                      )}
+                    </div>
+                    {productCategoryFilter !== 'ALL' && (
+                      <button
+                        type="button"
+                        onClick={() => handleOpenAddProduct(productCategoryFilter)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-[#0d9749] border border-emerald-300 rounded-lg text-xs font-bold transition-colors cursor-pointer shrink-0"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>+ Add to {productCategoryFilter}</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Quick Clickable Category Pills */}
+                  <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pt-1 border-t border-gray-100">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProductCategoryFilter('ALL');
+                        setProductPage(1);
+                      }}
+                      className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors cursor-pointer ${
+                        productCategoryFilter === 'ALL'
+                          ? 'bg-[#0d9749] text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      All ({products.length})
+                    </button>
+                    {categories.map((cat) => {
+                      const cnt = products.filter(
+                        (pr) => (pr.category || '').replace(/\s+/g, ' ').trim().toLowerCase() === cat.name.replace(/\s+/g, ' ').trim().toLowerCase()
+                      ).length;
+                      const isActive = productCategoryFilter === cat.name;
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => {
+                            setProductCategoryFilter(cat.name);
+                            setProductPage(1);
+                          }}
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors cursor-pointer ${
+                            isActive
+                              ? 'bg-[#0d9749] text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-emerald-50 hover:text-emerald-800'
+                          }`}
+                        >
+                          {cat.name} ({cnt})
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -1465,6 +1579,14 @@ export default function AdminPage() {
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-bold text-gray-900 text-sm">{c.name}</h3>
                         <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => handleOpenAddProduct(c.name)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#0d9749] hover:bg-[#097b3a] text-white font-bold rounded text-xs transition-colors cursor-pointer"
+                            title={`Add New Product in ${c.name}`}
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>Add Product</span>
+                          </button>
                           <button
                             onClick={() => handleOpenEditCategory(c)}
                             className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-[#0d9749] font-bold rounded border border-emerald-300 text-xs transition-colors cursor-pointer"
