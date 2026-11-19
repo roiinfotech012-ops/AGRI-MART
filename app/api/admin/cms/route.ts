@@ -3,6 +3,8 @@ import { revalidatePath } from 'next/cache';
 import { getCmsSetting, upsertCmsSetting } from '@/lib/db';
 import { DEFAULT_HOMEPAGE_CMS, DEFAULT_ABOUTUS_CMS, DEFAULT_CONTACTUS_CMS, DEFAULT_FOOTER_CMS } from '@/lib/cmsDefaults';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);

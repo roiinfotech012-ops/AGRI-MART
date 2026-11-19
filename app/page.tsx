@@ -82,7 +82,7 @@ export default function HomePage() {
 
   // Sync live CMS updates saved from Admin Console
   useEffect(() => {
-    fetch('/api/admin/cms?key=homepage')
+    fetch('/api/admin/cms?key=homepage', { cache: 'no-store' })
       .then((res) => res.json())
       .then((resData) => {
         if (resData.success && resData.data) {

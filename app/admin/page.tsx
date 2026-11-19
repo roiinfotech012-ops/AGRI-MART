@@ -586,7 +586,8 @@ export default function AdminPage() {
     }
   };
 
-  const handleSaveHomeCms = async () => {
+  const handleSaveHomeCms = async (overrides?: any) => {
+    const customOverrides = overrides && typeof overrides === 'object' && !('nativeEvent' in overrides) ? overrides : {};
     setIsSavingHome(true);
     try {
       const res = await fetch('/api/admin/cms', {
@@ -604,6 +605,7 @@ export default function AdminPage() {
             awardsSection: homeAwardsSection,
             institutesSection: homeInstitutesSection,
             appBanner: homeAppBanner,
+            ...customOverrides,
           },
         }),
       });
@@ -2305,7 +2307,9 @@ export default function AdminPage() {
                                 type="button"
                                 onClick={() => {
                                   if (confirm(`Remove Slide ${bIdx + 1}?`)) {
-                                    setHomeHeroBanners(prev => prev.filter((_, i) => i !== bIdx));
+                                    const updatedBanners = homeHeroBanners.filter((_, i) => i !== bIdx);
+                                    setHomeHeroBanners(updatedBanners);
+                                    handleSaveHomeCms({ heroBanners: updatedBanners });
                                   }
                                 }}
                                 className="text-red-500 hover:text-red-700 p-0.5 cursor-pointer"
@@ -2590,10 +2594,12 @@ export default function AdminPage() {
                               type="button"
                               onClick={() => {
                                 if (confirm(`Remove brand "${brand.name}"?`)) {
-                                  setHomeBrandsSection(prev => ({
-                                    ...prev,
-                                    brands: prev.brands.filter((_, i) => i !== bIdx)
-                                  }));
+                                  const updatedBrandsSection = {
+                                    ...homeBrandsSection,
+                                    brands: homeBrandsSection.brands.filter((_, i) => i !== bIdx),
+                                  };
+                                  setHomeBrandsSection(updatedBrandsSection);
+                                  handleSaveHomeCms({ brandsSection: updatedBrandsSection });
                                 }
                               }}
                               className="text-red-500 hover:text-red-700 p-0.5"
@@ -2758,10 +2764,12 @@ export default function AdminPage() {
                               type="button"
                               onClick={() => {
                                 if (confirm(`Remove spotlight "${pick.leadTitle}"?`)) {
-                                  setHomeTopPicksSection(prev => ({
-                                    ...prev,
-                                    picks: prev.picks.filter((_, i) => i !== pIdx)
-                                  }));
+                                  const updatedTopPicks = {
+                                    ...homeTopPicksSection,
+                                    picks: homeTopPicksSection.picks.filter((_, i) => i !== pIdx),
+                                  };
+                                  setHomeTopPicksSection(updatedTopPicks);
+                                  handleSaveHomeCms({ topPicksSection: updatedTopPicks });
                                 }
                               }}
                               className="text-red-500 hover:text-red-700 p-0.5"
@@ -2990,10 +2998,12 @@ export default function AdminPage() {
                                 type="button"
                                 onClick={() => {
                                   if (confirm(`Remove product "${prod.name}"?`)) {
-                                    setHomeFeaturedSection(prev => ({
-                                      ...prev,
-                                      products: prev.products.filter((_, i) => i !== pIdx)
-                                    }));
+                                    const updatedFeatured = {
+                                      ...homeFeaturedSection,
+                                      products: homeFeaturedSection.products.filter((_, i) => i !== pIdx),
+                                    };
+                                    setHomeFeaturedSection(updatedFeatured);
+                                    handleSaveHomeCms({ featuredProductsSection: updatedFeatured });
                                   }
                                 }}
                                 className="text-red-500 hover:text-red-700 p-0.5"
@@ -3208,10 +3218,12 @@ export default function AdminPage() {
                               type="button"
                               onClick={() => {
                                 if (confirm(`Remove award "${award.title}"?`)) {
-                                  setHomeAwardsSection(prev => ({
-                                    ...prev,
-                                    awards: prev.awards.filter((_, i) => i !== aIdx)
-                                  }));
+                                  const updatedAwards = {
+                                    ...homeAwardsSection,
+                                    awards: homeAwardsSection.awards.filter((_, i) => i !== aIdx),
+                                  };
+                                  setHomeAwardsSection(updatedAwards);
+                                  handleSaveHomeCms({ awardsSection: updatedAwards });
                                 }
                               }}
                               className="text-red-500 hover:text-red-700 p-0.5"
@@ -3356,10 +3368,12 @@ export default function AdminPage() {
                               type="button"
                               onClick={() => {
                                 if (confirm(`Remove institute "${inst.code}"?`)) {
-                                  setHomeInstitutesSection(prev => ({
-                                    ...prev,
-                                    institutes: prev.institutes.filter((_, i) => i !== iIdx)
-                                  }));
+                                  const updatedInstitutes = {
+                                    ...homeInstitutesSection,
+                                    institutes: homeInstitutesSection.institutes.filter((_, i) => i !== iIdx),
+                                  };
+                                  setHomeInstitutesSection(updatedInstitutes);
+                                  handleSaveHomeCms({ institutesSection: updatedInstitutes });
                                 }
                               }}
                               className="text-red-500 hover:text-red-700 p-0.5"
