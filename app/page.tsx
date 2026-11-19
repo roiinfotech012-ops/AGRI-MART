@@ -200,40 +200,28 @@ export default function HomePage() {
         onTouchStart={handleHeroTouchStart}
         onTouchEnd={handleHeroTouchEnd}
       >
-        <div className="max-w-[1440px] mx-auto relative aspect-[3/1] min-h-[150px] sm:min-h-[240px] md:min-h-[300px] w-full overflow-hidden">
+        <div className="max-w-[1440px] mx-auto relative aspect-[3/1] min-h-[150px] sm:min-h-[240px] md:min-h-[300px] w-full overflow-hidden bg-white">
           {heroBanners.map((banner, idx) => {
             const isVisible = idx === currentSlide;
             return (
               <div
                 key={banner.id}
-                style={{
-                  transform: `translate3d(0, ${heroParallaxY}px, 0)`,
-                }}
-                className={`absolute inset-0 transition-opacity duration-1000 ease-out will-change-transform ${
+                className={`absolute inset-0 transition-opacity duration-700 ease-out ${
                   isVisible ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
                 }`}
               >
-                {/* Layered Ultra-HD Banner Artwork with Slow Ken Burns Zoom */}
+                {/* Exact Original-Quality Banner Artwork (No Zoom, No Cropping, No Blur) */}
                 <Link
                   href={banner.link}
-                  className="block relative w-full h-full cursor-pointer select-none overflow-hidden"
+                  className="flex items-center justify-center relative w-full h-full cursor-pointer select-none overflow-hidden bg-white"
                   aria-label={banner.alt}
                 >
-                  <Image
+                  <img
                     src={banner.image}
                     alt={banner.alt}
-                    fill
-                    priority={idx === 0}
                     loading={idx === 0 ? 'eager' : 'lazy'}
-                    unoptimized
-                    quality={100}
-                    sizes="(max-width: 1440px) 100vw, 1440px"
-                    className={`object-cover object-center pointer-events-none select-none ${
-                      isVisible ? 'animate-hero-kenburns' : ''
-                    }`}
+                    className="max-w-full max-h-full w-auto h-auto object-contain object-center pointer-events-none select-none"
                   />
-                  {/* Luxury Subtle Vignette Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/10 pointer-events-none" />
                 </Link>
               </div>
             );
