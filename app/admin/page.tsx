@@ -147,7 +147,7 @@ export default function AdminPage() {
       appStoreLink: 'https://apps.apple.com/in/app/agrimart/id1599062786',
     }
   );
-  const [homeSectionFilter, setHomeSectionFilter] = useState<string>('all');
+  const [homeSectionFilter, setHomeSectionFilter] = useState<string>('menu');
   const [isSavingHome, setIsSavingHome] = useState(false);
   const [homeSaveSuccess, setHomeSaveSuccess] = useState(false);
 
@@ -1119,7 +1119,10 @@ export default function AdminPage() {
           </div>
 
           <button
-            onClick={() => setActiveTab('homepage')}
+            onClick={() => {
+              setActiveTab('homepage');
+              setHomeSectionFilter('menu');
+            }}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded transition-colors ${
               activeTab === 'homepage' ? 'bg-[#0d9749] text-white' : 'hover:bg-gray-100'
             }`}
@@ -2098,35 +2101,146 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Quick Section Filter Navigation Bar */}
-              <div className="flex flex-wrap items-center gap-1.5 p-2 bg-white rounded-xl border border-gray-200 shadow-sm sticky top-2 z-10">
-                <span className="text-[11px] font-bold text-gray-500 uppercase px-2">Jump to Section:</span>
-                {[
-                  { id: 'all', label: 'All 9 Sections' },
-                  { id: 'hero', label: '1. Hero Carousel' },
-                  { id: 'promo', label: '2. Promo Cards' },
-                  { id: 'categories', label: '3. Categories' },
-                  { id: 'brands', label: '4. Brands Strip' },
-                  { id: 'toppicks', label: '5. Top Picks' },
-                  { id: 'featured', label: '6. Featured Machinery' },
-                  { id: 'awards', label: '7. Awards Marquee' },
-                  { id: 'institutes', label: '8. Testing Institutes' },
-                  { id: 'app', label: '9. Mobile App Banner' },
-                ].map((s) => (
-                  <button
-                    key={s.id}
-                    type="button"
-                    onClick={() => setHomeSectionFilter(s.id)}
-                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                      homeSectionFilter === s.id
-                        ? 'bg-emerald-600 text-white shadow-sm'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {s.label}
-                  </button>
-                ))}
-              </div>
+              {/* Home Page Section Selector Hub (Clean Button Cards) */}
+              {homeSectionFilter === 'menu' ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    {
+                      id: 'hero',
+                      num: '01',
+                      title: 'Hero Carousel Banners',
+                      count: `${homeHeroBanners.length} Slides`,
+                      desc: 'Upload or edit main homepage slider banners, titles, and links.',
+                    },
+                    {
+                      id: 'promo',
+                      num: '02',
+                      title: 'Promo Showcase Cards',
+                      count: `${homePromoBanners.length} Cards`,
+                      desc: 'Edit the 3 promotional highlight cards below the hero slider.',
+                    },
+                    {
+                      id: 'categories',
+                      num: '03',
+                      title: 'Shop by Category Header',
+                      count: 'Header Text',
+                      desc: 'Customize the badge, title, and subtitle for the category grid.',
+                    },
+                    {
+                      id: 'brands',
+                      num: '04',
+                      title: 'Trusted Brands Strip',
+                      count: `${homeBrandsSection.brands.length} Brands`,
+                      desc: 'Upload brand logos, edit taglines, and manage brand links.',
+                    },
+                    {
+                      id: 'toppicks',
+                      num: '05',
+                      title: "Agrimart's Top Picks",
+                      count: `${homeTopPicksSection.picks.length} Spotlights`,
+                      desc: 'Edit curated hero machine spotlights, photos, and highlights.',
+                    },
+                    {
+                      id: 'featured',
+                      num: '06',
+                      title: 'Featured Machinery',
+                      count: `${homeFeaturedSection.products.length} Products`,
+                      desc: 'Manage featured machinery cards, badges, and images.',
+                    },
+                    {
+                      id: 'awards',
+                      num: '07',
+                      title: 'Awards & Recognitions',
+                      count: `${homeAwardsSection.awards.length} Awards`,
+                      desc: 'Upload award trophies, titles, organizations, and years.',
+                    },
+                    {
+                      id: 'institutes',
+                      num: '08',
+                      title: 'Testing Institutes',
+                      count: `${homeInstitutesSection.institutes.length} Institutes`,
+                      desc: 'Manage certified testing centers, codes, and logos.',
+                    },
+                    {
+                      id: 'app',
+                      num: '09',
+                      title: 'Mobile App Banner',
+                      count: 'App Links',
+                      desc: 'Update the mobile app banner graphic, Play Store & App Store URLs.',
+                    },
+                  ].map((sec) => (
+                    <button
+                      key={sec.id}
+                      type="button"
+                      onClick={() => setHomeSectionFilter(sec.id)}
+                      className="group text-left bg-white hover:bg-emerald-50/40 p-5 rounded-xl border border-gray-200 hover:border-[#0d9749] shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between gap-4"
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-black text-[#0d9749] bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+                            SECTION {sec.num}
+                          </span>
+                          <span className="text-[11px] font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                            {sec.count}
+                          </span>
+                        </div>
+                        <h3 className="text-sm font-bold text-gray-900 group-hover:text-[#0d9749] transition-colors">
+                          {sec.title}
+                        </h3>
+                        <p className="text-xs text-gray-500 leading-relaxed">
+                          {sec.desc}
+                        </p>
+                      </div>
+                      <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-xs font-bold text-[#0d9749]">
+                        <span>Edit Section</span>
+                        <span className="group-hover:translate-x-1 transition-transform">→</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                /* Clean Section Navigation Bar (Non-Overlapping) */
+                <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-xs space-y-2.5">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => setHomeSectionFilter('menu')}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                    >
+                      <span>← Back to All Home Sections</span>
+                    </button>
+                    <span className="text-[11px] font-semibold text-gray-500">
+                      Editing 1 section at a time — click any button below to switch
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-gray-100">
+                    {[
+                      { id: 'hero', label: '1. Hero Carousel' },
+                      { id: 'promo', label: '2. Promo Cards' },
+                      { id: 'categories', label: '3. Categories' },
+                      { id: 'brands', label: '4. Brands Strip' },
+                      { id: 'toppicks', label: '5. Top Picks' },
+                      { id: 'featured', label: '6. Featured Machinery' },
+                      { id: 'awards', label: '7. Awards' },
+                      { id: 'institutes', label: '8. Institutes' },
+                      { id: 'app', label: '9. Mobile App' },
+                    ].map((s) => (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => setHomeSectionFilter(s.id)}
+                        className={`px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                          homeSectionFilter === s.id
+                            ? 'bg-[#0d9749] text-white shadow-xs'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* 1. Hero Banners Carousel Manager */}
               {(homeSectionFilter === 'all' || homeSectionFilter === 'hero') && (
