@@ -110,7 +110,13 @@ export async function POST(req: NextRequest) {
 
     const created = await createProductInDb(fullProduct);
 
-    safeRevalidate(['/', '/products', `/products/${created.slug}`, `/products/${created.id}`]);
+    safeRevalidate([
+      '/',
+      '/products',
+      `/products/${created.slug}`,
+      `/products/${created.id}`,
+      `/products/${created.riplCode.toLowerCase()}`,
+    ]);
 
     return NextResponse.json({
       success: true,

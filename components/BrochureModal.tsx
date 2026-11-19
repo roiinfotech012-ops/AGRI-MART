@@ -3,6 +3,7 @@
 import React from 'react';
 import { X, FileText, ExternalLink, FileCheck } from 'lucide-react';
 import { Product } from '@/types';
+import { resolveBrochureUrl } from '@/lib/format';
 
 interface BrochureModalProps {
   product: Product;
@@ -23,13 +24,18 @@ export default function BrochureModal({
 }: BrochureModalProps) {
   if (!isOpen) return null;
 
-  const fileBasename = (brochureUrl || '').split('/').pop() || '';
-  const directDocumentUrl = brochureUrl?.startsWith('/uploads/')
-    ? brochureUrl
-    : (fileBasename ? `/uploads/product_brochure/1/${fileBasename}` : (brochureUrl || ''));
+  const directDocumentUrl = resolveBrochureUrl(brochureUrl);
+  const fileBasename = directDocumentUrl.startsWith('data:')
+    ? (brochureTitle || `${product.riplCode || 'product'}-brochure.pdf`)
+    : (directDocumentUrl.split('/').pop() || brochureTitle || 'brochure.pdf');
 
   const ext = (directDocumentUrl || '').split('?')[0].split('.').pop()?.toLowerCase() || '';
-  const isImageBrochure = ext === 'jpg' || ext === 'jpeg' || ext === 'png' || ext === 'webp';
+  const isImageBrochure =
+    directDocumentUrl.startsWith('data:image/') ||
+    ext === 'jpg' ||
+    ext === 'jpeg' ||
+    ext === 'png' ||
+    ext === 'webp';
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/75 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 print:p-0 print:bg-white print:static">

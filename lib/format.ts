@@ -148,3 +148,24 @@ export function formatCategoryName(name: string): string {
     .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
 }
+
+/**
+ * Resolves a product brochure URL across newly uploaded endpoints (/api/uploads/...),
+ * data URIs, external HTTPS links, local /uploads/ or /assets/, and legacy filenames.
+ */
+export function resolveBrochureUrl(rawUrl?: string): string {
+  const url = (rawUrl || '').trim();
+  if (!url) return '';
+  if (
+    url.startsWith('/api/uploads/') ||
+    url.startsWith('/uploads/') ||
+    url.startsWith('/assets/') ||
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('data:')
+  ) {
+    return url;
+  }
+  const fileBasename = url.split('/').pop() || '';
+  return fileBasename ? `/uploads/product_brochure/1/${fileBasename}` : url;
+}

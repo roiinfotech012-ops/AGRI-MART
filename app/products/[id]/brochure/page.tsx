@@ -1,6 +1,7 @@
 import { redirect, notFound } from 'next/navigation';
 import productsData from '@/data/import/products.json';
 import { getProductByIdOrSlug } from '@/lib/db';
+import { resolveBrochureUrl } from '@/lib/format';
 import { Product } from '@/types';
 
 export const dynamicParams = true;
@@ -52,10 +53,9 @@ export default async function ProductBrochurePage({
   }
 
   if (product.brochures && product.brochures.length > 0) {
-    const primaryUrl = product.brochures[0].url;
-    const base = primaryUrl.split('/').pop() || '';
-    if (base) {
-      redirect(`/uploads/product_brochure/1/${base}`);
+    const resolved = resolveBrochureUrl(product.brochures[0].url);
+    if (resolved) {
+      redirect(resolved);
     }
   }
 

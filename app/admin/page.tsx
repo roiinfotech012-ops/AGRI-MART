@@ -367,13 +367,35 @@ export default function AdminPage() {
       }
     });
 
+    // Automatically include any uploaded/entered brochure that wasn't clicked into the list yet
+    let mergedBrochures = [...editBrochures];
+    if (newBrochureUrl.trim()) {
+      const effectiveLang = (newBrochureLang === 'Other' ? customBrochureLang : newBrochureLang).trim() || 'English';
+      const effectiveName = newBrochureName.trim() || `${editingProduct.name || 'Machinery'} Brochure (${effectiveLang})`;
+      const pendingEntry = {
+        language: effectiveLang,
+        name: effectiveName,
+        url: newBrochureUrl.trim(),
+      };
+      if (editingBrochureIndex !== null && mergedBrochures[editingBrochureIndex]) {
+        mergedBrochures[editingBrochureIndex] = pendingEntry;
+      } else {
+        const alreadyExists = mergedBrochures.some(
+          (b) => b.url.trim() === pendingEntry.url && b.language === pendingEntry.language
+        );
+        if (!alreadyExists) {
+          mergedBrochures.push(pendingEntry);
+        }
+      }
+    }
+
     const payload: Product = {
       ...editingProduct,
       slug: editingProduct.slug || editingProduct.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
       thumbnailImage: editImages[0] || editingProduct.thumbnailImage || '/assets/branding/logo.png',
       images: editImages.length > 0 ? editImages : [editingProduct.thumbnailImage || '/assets/branding/logo.png'],
       specifications: specsRecord,
-      brochures: editBrochures.filter(b => b && b.url && b.url.trim() !== ''),
+      brochures: mergedBrochures.filter(b => b && b.url && b.url.trim() !== ''),
     };
 
     try {

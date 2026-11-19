@@ -13,7 +13,7 @@ import SubsidyModal from '@/components/SubsidyModal';
 import QuoteModal from '@/components/QuoteModal';
 import BrochureModal from '@/components/BrochureModal';
 import { Product } from '@/types';
-import { formatProductTitle, getDefaultCategoryImage } from '@/lib/format';
+import { formatProductTitle, getDefaultCategoryImage, resolveBrochureUrl } from '@/lib/format';
 import { extractProductSpecs, parseProductDescription } from '@/lib/productSpecs';
 
 interface ProductDetailClientProps {
@@ -296,8 +296,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     validBrochures.map((b, idx) => {
                       const cleanTitle = (b.name || '').replace(/^(view\s*)+/i, '').trim() || `${product.name} Brochure`;
                       const docLang = b.language || 'English';
-                      const fileBasename = (b.url || '').split('/').pop() || '';
-                      const directUrl = fileBasename ? `/uploads/product_brochure/1/${fileBasename}` : (b.url || '');
+                      const directUrl = resolveBrochureUrl(b.url);
                       return (
                         <div
                           key={idx}
