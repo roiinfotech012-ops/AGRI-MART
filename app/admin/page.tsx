@@ -4602,12 +4602,20 @@ export default function AdminPage() {
                     1. General & Brand
                   </button>
                   <button
+                    onClick={() => setActiveEditTab('desc')}
+                    className={`py-3 px-3 border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
+                      activeEditTab === 'desc' ? 'border-[#0d9749] text-[#0d9749]' : 'border-transparent text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    2. Description & Overview
+                  </button>
+                  <button
                     onClick={() => setActiveEditTab('images')}
                     className={`py-3 px-3 border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
                       activeEditTab === 'images' ? 'border-[#0d9749] text-[#0d9749]' : 'border-transparent text-gray-600 hover:text-gray-900'
                     }`}
                   >
-                    2. Photos & Media ({editImages.length})
+                    3. Photos & Media ({editImages.length})
                   </button>
                   <button
                     onClick={() => setActiveEditTab('accessories')}
@@ -4615,7 +4623,7 @@ export default function AdminPage() {
                       activeEditTab === 'accessories' ? 'border-[#0d9749] text-[#0d9749]' : 'border-transparent text-gray-600 hover:text-gray-900'
                     }`}
                   >
-                    3. Accessories ({editAccessories.length})
+                    4. Accessories ({editAccessories.length})
                   </button>
                   <button
                     onClick={() => setActiveEditTab('videos')}
@@ -4623,7 +4631,7 @@ export default function AdminPage() {
                       activeEditTab === 'videos' ? 'border-[#0d9749] text-[#0d9749]' : 'border-transparent text-gray-600 hover:text-gray-900'
                     }`}
                   >
-                    4. Videos ({editVideos.length})
+                    5. Videos ({editVideos.length})
                   </button>
                   <button
                     onClick={() => setActiveEditTab('brochures')}
@@ -4632,15 +4640,7 @@ export default function AdminPage() {
                     }`}
                   >
                     <FileText className="w-3.5 h-3.5" />
-                    <span>5. Multi-Language Brochures ({editBrochures.length})</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveEditTab('desc')}
-                    className={`py-3 px-3 border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
-                      activeEditTab === 'desc' ? 'border-[#0d9749] text-[#0d9749]' : 'border-transparent text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    6. Description & Overview
+                    <span>6. Multi-Language Brochures ({editBrochures.length})</span>
                   </button>
                 </div>
 
