@@ -3,6 +3,12 @@ import { revalidatePath } from 'next/cache';
 import { getCmsSetting, upsertCmsSetting } from '@/lib/db';
 import { DEFAULT_HOMEPAGE_CMS, DEFAULT_ABOUTUS_CMS, DEFAULT_CONTACTUS_CMS, DEFAULT_FOOTER_CMS } from '@/lib/cmsDefaults';
 
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+  Pragma: 'no-cache',
+  Expires: '0',
+};
+
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
@@ -22,7 +28,7 @@ export async function GET(req: NextRequest) {
         ? DEFAULT_FOOTER_CMS
         : null;
       const merged = (data && fallback) ? { ...fallback, ...data } : (data || fallback);
-      return NextResponse.json({ success: true, key, data: merged });
+      return NextResponse.json({ success: true, key, data: merged }, { headers: NO_CACHE_HEADERS });
     }
 
     const [homepage, aboutus, contactus, footer] = await Promise.all([
@@ -32,13 +38,16 @@ export async function GET(req: NextRequest) {
       getCmsSetting('footer'),
     ]);
 
-    return NextResponse.json({
-      success: true,
-      homepage: homepage ? { ...DEFAULT_HOMEPAGE_CMS, ...homepage } : DEFAULT_HOMEPAGE_CMS,
-      aboutus: aboutus ? { ...DEFAULT_ABOUTUS_CMS, ...aboutus } : DEFAULT_ABOUTUS_CMS,
-      contactus: contactus ? { ...DEFAULT_CONTACTUS_CMS, ...contactus } : DEFAULT_CONTACTUS_CMS,
-      footer: footer ? { ...DEFAULT_FOOTER_CMS, ...footer } : DEFAULT_FOOTER_CMS,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        homepage: homepage ? { ...DEFAULT_HOMEPAGE_CMS, ...homepage } : DEFAULT_HOMEPAGE_CMS,
+        aboutus: aboutus ? { ...DEFAULT_ABOUTUS_CMS, ...aboutus } : DEFAULT_ABOUTUS_CMS,
+        contactus: contactus ? { ...DEFAULT_CONTACTUS_CMS, ...contactus } : DEFAULT_CONTACTUS_CMS,
+        footer: footer ? { ...DEFAULT_FOOTER_CMS, ...footer } : DEFAULT_FOOTER_CMS,
+      },
+      { headers: NO_CACHE_HEADERS }
+    );
   } catch (err: any) {
     console.error('Error loading CMS settings from PostgreSQL:', err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

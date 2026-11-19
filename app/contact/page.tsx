@@ -19,7 +19,7 @@ export default function ContactPage() {
   const [cmsData, setCmsData] = useState<ContactUsCmsData>(DEFAULT_CONTACTUS_CMS);
 
   useEffect(() => {
-    fetch('/api/admin/cms?key=contactus')
+    fetch('/api/admin/cms?key=contactus', { cache: 'no-store' })
       .then((res) => res.json())
       .then((resData) => {
         if (resData.success && resData.data) {

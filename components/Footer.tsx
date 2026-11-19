@@ -10,7 +10,7 @@ export default function Footer() {
   const [footerData, setFooterData] = useState<FooterCmsData>(DEFAULT_FOOTER_CMS);
 
   useEffect(() => {
-    fetch('/api/admin/cms?key=footer')
+    fetch('/api/admin/cms?key=footer', { cache: 'no-store' })
       .then((res) => res.json())
       .then((resData) => {
         if (resData.success && resData.data) {

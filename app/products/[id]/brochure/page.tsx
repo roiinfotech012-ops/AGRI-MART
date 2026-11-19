@@ -5,7 +5,7 @@ import { resolveBrochureUrl } from '@/lib/format';
 import { Product } from '@/types';
 
 export const dynamicParams = true;
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export function generateStaticParams() {
   const prods = productsData as unknown as Product[];

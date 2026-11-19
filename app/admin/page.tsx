@@ -232,7 +232,7 @@ export default function AdminPage() {
   useEffect(() => {
     fetchDbStatus();
 
-    fetch('/api/admin/products')
+    fetch('/api/admin/products', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.products)) {
@@ -241,7 +241,7 @@ export default function AdminPage() {
       })
       .catch(e => console.error('API products load error:', e));
 
-    fetch('/api/admin/categories')
+    fetch('/api/admin/categories', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.categories)) {
@@ -250,7 +250,7 @@ export default function AdminPage() {
       })
       .catch(e => console.error('API categories load error:', e));
 
-    fetch('/api/admin/cms')
+    fetch('/api/admin/cms', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         if (data.success) {

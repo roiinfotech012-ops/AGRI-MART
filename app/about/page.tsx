@@ -5,7 +5,7 @@ import { Target, Compass, Award, ShieldCheck, CheckCircle2, Phone, MapPin } from
 import { getCmsSetting } from '@/lib/db';
 import { DEFAULT_ABOUTUS_CMS, AboutUsCmsData } from '@/lib/cmsDefaults';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 async function getAboutData(): Promise<AboutUsCmsData> {
   try {

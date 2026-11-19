@@ -7,11 +7,19 @@ import {
   deleteCategoryInDb,
 } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+  Pragma: 'no-cache',
+  Expires: '0',
+};
+
 // GET: fetch all categories from PostgreSQL
 export async function GET() {
   try {
     const categories = await getAllCategories();
-    return NextResponse.json({ success: true, count: categories.length, categories });
+    return NextResponse.json({ success: true, count: categories.length, categories }, { headers: NO_CACHE_HEADERS });
   } catch (error: any) {
     console.error('Error reading categories from PostgreSQL:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

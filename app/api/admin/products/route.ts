@@ -8,6 +8,14 @@ import {
 } from '@/lib/db';
 import { Product } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+  Pragma: 'no-cache',
+  Expires: '0',
+};
+
 function safeRevalidate(paths: string[]) {
   for (const p of paths) {
     try {
@@ -22,7 +30,7 @@ function safeRevalidate(paths: string[]) {
 export async function GET() {
   try {
     const products = await getAllProducts();
-    return NextResponse.json({ success: true, count: products.length, products });
+    return NextResponse.json({ success: true, count: products.length, products }, { headers: NO_CACHE_HEADERS });
   } catch (error: any) {
     console.error('Error reading products from PostgreSQL:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
